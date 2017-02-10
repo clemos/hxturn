@@ -1,0 +1,20 @@
+{
+  "name": "hxturn",
+  "version": "0.0.1",
+  "description": "",
+  "main": "bin/server.js",
+  "scripts": {
+    "postinstall": "npm run haxelib",
+    "haxelib": "haxelib --always install hxnodejs",
+    "build": "haxe build.hxml",
+    "start": "node bin/server.js",
+    "serve": "http-server --cors pub",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Clément Charmet <cl3mos@gmail.com> (http://github.com/clemos)",
+  "license": "ISC",
+  "devDependencies": {
+    "haxe": "github:clemos/npm-haxe",
+    "http-server": "^0.9.0"
+  }
+}
