@@ -1,5 +1,6 @@
 package turn.message;
 
+using StringTools;
 import haxe.io.Input;
 
 @:enum
@@ -60,14 +61,14 @@ abstract MessageType(Int) to Int {
 
     @:from public static inline function fromInt(code:Int):MessageType {
         if( !LABELS.exists(code) ) {
-            throw 'Invalid message type: $code';
+            throw 'Unknown message type: 0x${code.hex(4)}';
         }
         return new MessageType(code);
     }
 
     public static inline function read( i:Input ):MessageType {
         i.bigEndian = true;
-        return fromInt(i.readInt16());
+        return fromInt(i.readUInt16());
     }
 
 }

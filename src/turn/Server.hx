@@ -26,7 +26,7 @@ class Server {
     }
 
     function onMessage(buffer:Buffer, address:SocketAdress){
-        //trace('got message', buffer,address);
+        trace('got message', buffer,address);
         var bytes = buffer.hxToBytes();
         //var input = new BytesInput(bytes);
         var data = new Reader(bytes);

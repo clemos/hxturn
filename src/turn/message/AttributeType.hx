@@ -1,5 +1,8 @@
 package turn.message;
 
+using StringTools;
+import haxe.io.Input;
+
 @:enum abstract AttributeType(Int) to Int {
     var MappedAddress = 0x0001;
     var Username = 0x0006;
@@ -46,14 +49,24 @@ package turn.message;
     var Password = 0x0007;
     var ReflectedFrom = 0x000B;
 
+    // rfc5766 https://tools.ietf.org/html/rfc5766
+    var ChannelNumber = 0x000C;
+    var XorRelayedAddress = 0x0016;
+    var EvenPort = 0x0018;
+    var RequestedTransport = 0x0019;
+    var DontFragment = 0x001A;
+    var ReservationToken = 0x0022;
+
+
+
     static var LABELS:Map<Int,String> = [
         MappedAddress => 'MappedAddress',
         Username => 'Username',
         MessageIntegrity => 'MessageIntegrity',
         ErrorCode => 'ErrorCode',
-        UnknownAttributes => 'UnknownAttributes'
+        UnknownAttributes => 'UnknownAttributes',
         Lifetime => 'Lifetime',
-        AlternateServer => 'AlternateServer'
+        AlternateServer => 'AlternateServer',
         MagicCookie => 'MagicCookie',
         Bandwidth => 'Bandwidth',
         DestinationAddress => 'DestinationAddress',
@@ -90,7 +103,17 @@ package turn.message;
         SourceAddress => 'SourceAddress',
         ChangedAddress => 'ChangedAddress',
         Password => 'Password',
-        ReflectedFrom => 'ReflectedFrom'
+        ReflectedFrom => 'ReflectedFrom',
+
+        // rfc5766 https://tools.ietf.org/html/rfc5766
+    
+        ChannelNumber => 'ChannelNumber',
+        XorRelayedAddress => 'XorRelayedAddress',
+        EvenPort => 'EvenPort',
+        RequestedTransport => 'RequestedTransport',
+        DontFragment => 'DontFragment',
+        ReservationToken => 'ReservationToken',
+
     ];
 
     function new(type:Int){
@@ -103,13 +126,13 @@ package turn.message;
 
     @:from public static function fromInt(code:Int):AttributeType {
         if( !LABELS.exists(code) ) {
-            throw 'Invalid attribute type: $code';
+            throw 'Unknown attribute type: 0x${code.hex(4)}';
         }
         return new AttributeType(code);
     }
 
-    public static inline function read( i:Input ):MessageType {
+    public static inline function read( i:Input ):AttributeType {
         i.bigEndian = true;
-        return fromInt(i.readInt16());
+        return fromInt(i.readUInt16());
     }
 }
