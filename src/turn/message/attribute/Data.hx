@@ -13,6 +13,8 @@ enum Data {
     Realm( realm:String );
     Nonce( nonce:String );
     Username( username:String );
+    Software( username:String );
+    Fingerprint( fingerprint:Int );
 
     Unknown( type:AttributeType, data:Bytes );
 }

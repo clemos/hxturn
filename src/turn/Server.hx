@@ -15,8 +15,9 @@ typedef AttributeData = turn.message.attribute.Data;
 class Server {
     var udp : Socket;
 
-    var nonce = "abcdefg";
-    var realm = "aaaliasing.net";
+    var nonce = "1234";
+    var realm = "test";
+    var software = "None";
 
     public function new(){
         udp = Dgram.createSocket("udp4");
@@ -46,6 +47,22 @@ class Server {
         switch( request.type ) {
             case MessageType.AllocateRequest: 
 
+                for( a in request.attributes ) {
+                    switch(a){
+                        case Fingerprint(fingerprint) :
+                            //fingerprint = fingerprint & 0xffffffff;
+                            trace('got fingerprint',fingerprint,StringTools.hex(fingerprint));
+                            var check = bytes.sub(0,bytes.length-8);
+                            trace('checking', check.length );
+                            var crc32 = haxe.crypto.Crc32.make(check);
+                            crc32 = crc32 ^ 0x5354554e;
+                            //crc32 = crc32 & 0xffffffff;
+                            trace('crc32 = ', crc32, StringTools.hex(crc32));
+                            
+                            trace(crc32 == fingerprint ? 'ok': 'ko');
+                        default:
+                    }
+                }
                 // for( a in request.attributes ) {
                 //     switch(a){
                 //         case Unknown( AttributeType.RequestedAddressFamily, _ ):
@@ -67,9 +84,10 @@ class Server {
                     type : MessageType.AllocateErrorResponse,
                     transactionId: request.transactionId,
                     attributes : [
-                        AttributeData.ErrorCode(401, "Unauthorised"),
+                        AttributeData.ErrorCode(401, "Unauthorized"),
+                        AttributeData.Nonce(nonce),
                         AttributeData.Realm(realm),
-                        AttributeData.Nonce(nonce)
+                        AttributeData.Software(software)
                     ]
                 };
 
@@ -81,7 +99,9 @@ class Server {
 
     function respond( address:SocketAdress, response:Data ) {
         var client = udp;//Dgram.createSocket('udp4');
-        var message = turn.message.Writer.write(response);
+        var writer = new turn.message.Writer();
+        writer.write(response);
+        var message = writer.getBytes();
         trace('responding...',response);
         trace('to', address);
         var buf = js.node.Buffer.hxFromBytes(message);

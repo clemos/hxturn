@@ -8,23 +8,51 @@ import turn.message.Data;
 typedef AttributeWriter = turn.message.attribute.Writer;
 
 class Writer {
-    public static function write(data:Data):Bytes {
-        var b = new BytesOutput();
-        b.bigEndian = true;
+
+    var output:BytesOutput;
+
+    var addFingerprint=false;
+
+    static inline var FINGERPRINT_LENGTH = 8;
+
+    public function new(){
+        output = new BytesOutput();
+        output.bigEndian = true;
+    }
+
+    public function getBytes(){
+        var bytes = output.getBytes();
+        if( addFingerprint ) {
+            var crc32 = haxe.crypto.Crc32.make( bytes );
+            var aWriter = new AttributeWriter();
+            aWriter.writeAttribute(Fingerprint(crc32));
+            var fingerprint = aWriter.getBytes();
+
+            var o = new BytesOutput();
+            o.bigEndian = true;
+            o.writeBytes(bytes, 0, bytes.length);
+            o.writeBytes(fingerprint, 0, fingerprint.length);
+
+            return o.getBytes();
+        }
+
+        return bytes;
+    }
+
+    public function write(data:Data):Void {
         var aWriter = new AttributeWriter();
         aWriter.write(data.attributes);
         var attributes = aWriter.getBytes();
 
-        writeHeader(b, data.type, data.transactionId, attributes.length);
-        b.writeBytes(attributes, 0, attributes.length);
-
-        return b.getBytes();
+        writeHeader(data.type, data.transactionId, attributes.length);
+        output.writeBytes(attributes, 0, attributes.length);
 
     }
 
-    public static function writeHeader(b:Output, type:MessageType, transactionId:TransactionId, length:Int){
-        b.writeUInt16(type);
-        b.writeUInt16(length);
-        b.writeBytes(transactionId, 0, transactionId.length);
+    function writeHeader(type:MessageType, transactionId:TransactionId, length:Int){
+        output.writeUInt16(type);
+        output.writeUInt16(length + (addFingerprint ? FINGERPRINT_LENGTH : 0) );
+        output.writeBytes(transactionId, 0, transactionId.length);
     }
+
 }

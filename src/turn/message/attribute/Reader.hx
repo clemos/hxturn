@@ -34,6 +34,10 @@ class Reader {
                     attributes.push(Realm(readAttribute().toString()));
                 case AttributeType.Nonce:
                     attributes.push(Nonce(readAttribute().toString()));
+                case AttributeType.Software:
+                    attributes.push(Software(readAttribute().toString()));
+                case AttributeType.Fingerprint:
+                    attributes.push(Fingerprint(readAttribute().getInt32(0)));
                 default:
                     attributes.push(Unknown(attributeType,readAttribute()));
             }

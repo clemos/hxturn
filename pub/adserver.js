@@ -3,17 +3,17 @@ var RTCSessionDescription = wrtc.RTCSessionDescription;
 var RTCIceCandidate       = wrtc.RTCIceCandidate;
 
 var username = '';
-for(var i=0; i<10000; i++) {
+for(var i=0; i<100; i++) {
   username += 'a';
 }
 
 var iceCandidates = [];
 var googleIce = {url:'stun:stun.l.google.com:19302'};
 var localIce = {
-    urls: ['turn:127.0.0.1:3478'],
+    urls: ['turn:127.0.0.1'],
     //urls: ['turn:127.0.0.1:3478'],
-    username: username,
-    credential: 'toto'
+    username: 'clemos',//username,
+    credential: 'test'
 };
 
 function trace(){

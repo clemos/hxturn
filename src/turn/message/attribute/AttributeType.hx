@@ -16,8 +16,8 @@ import haxe.io.Input;
     var DestinationAddress = 0x0011;
     var RemoteAddress = 0x0012;
     var Data = 0x0013;
-    var Nonce = 0x0014;
-    var Realm = 0x0015;
+    var Nonce = 0x0015;
+    var Realm = 0x0014;
     var XorMappedAddress = 0x8020;
 
     var XorMappedAddressStun = 0x0020;
