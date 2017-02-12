@@ -1,4 +1,4 @@
-package turn.message;
+package turn.message.attribute;
 
 using StringTools;
 import haxe.io.Input;
@@ -21,8 +21,8 @@ import haxe.io.Input;
     var XorMappedAddress = 0x8020;
 
     var XorMappedAddressStun = 0x0020;
-    var RealmStun = 0x0014; 
-    var NonceStun = 0x0015;
+    //var RealmStun = 0x0014; 
+    //var NonceStun = 0x0015;
 
     // The following optional attributes are also supported in
     // this extension. Any other attributes from the optional
@@ -57,6 +57,9 @@ import haxe.io.Input;
     var DontFragment = 0x001A;
     var ReservationToken = 0x0022;
 
+    // rfc6156
+    var RequestedAddressFamily = 0x0017;
+
 
 
     static var LABELS:Map<Int,String> = [
@@ -77,8 +80,8 @@ import haxe.io.Input;
         XorMappedAddress => 'XorMappedAddress',
 
         XorMappedAddressStun => 'XorMappedAddressStun',
-        RealmStun => 'RealmStun',
-        NonceStun => 'NonceStun',
+        //RealmStun => 'RealmStun',
+        //NonceStun => 'NonceStun',
 
         // The following optional attributes are also supported in
         // this extension. Any other attributes from the optional
@@ -114,6 +117,9 @@ import haxe.io.Input;
         DontFragment => 'DontFragment',
         ReservationToken => 'ReservationToken',
 
+        // rfc6156
+        RequestedAddressFamily => 'RequestedAddressFamily'
+
     ];
 
     function new(type:Int){
@@ -125,13 +131,14 @@ import haxe.io.Input;
     }
 
     @:from public static function fromInt(code:Int):AttributeType {
+        trace('attribute 0x${code.hex(4)}', LABELS[code]);
         if( !LABELS.exists(code) ) {
             throw 'Unknown attribute type: 0x${code.hex(4)}';
         }
         return new AttributeType(code);
     }
 
-    public static inline function read( i:Input ):AttributeType {
+    public static inline function read(i:Input):AttributeType {
         i.bigEndian = true;
         return fromInt(i.readUInt16());
     }

@@ -9,6 +9,7 @@ abstract MessageType(Int) to Int {
     var AllocateRequest:MessageType = 0x0003;
     var AllocateResponse:MessageType = 0x0103;
     var AllocateErrorResponse:MessageType = 0x0113;
+    
     var SendRequest:MessageType = 0x0004;
     var DataIndication:MessageType = 0x0115;
     var SetActiveDestinationRequest:MessageType = 0x0006;
@@ -57,6 +58,10 @@ abstract MessageType(Int) to Int {
 
     public inline function label(){
         return LABELS[this];
+    }
+
+    public inline function toString(){
+        return label();
     }
 
     @:from public static inline function fromInt(code:Int):MessageType {

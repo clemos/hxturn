@@ -2,12 +2,17 @@ var RTCPeerConnection     = wrtc.RTCPeerConnection;
 var RTCSessionDescription = wrtc.RTCSessionDescription;
 var RTCIceCandidate       = wrtc.RTCIceCandidate;
 
+var username = '';
+for(var i=0; i<10000; i++) {
+  username += 'a';
+}
+
 var iceCandidates = [];
 var googleIce = {url:'stun:stun.l.google.com:19302'};
 var localIce = {
-    urls: ['turn:clemos@127.0.0.1:3478'],
+    urls: ['turn:127.0.0.1:3478'],
     //urls: ['turn:127.0.0.1:3478'],
-    username: 'test',
+    username: username,
     credential: 'toto'
 };
 
