@@ -14,12 +14,11 @@ typedef AttributeData = turn.message.attribute.Data;
 
 class Server {
     var udp : Socket;
+    var listener : ServerListener;
 
-    var nonce = "91217987db7f0936";
-    var realm = "test";
-    var software = "None";
+    public function new(listener:ServerListener){
+        this.listener = listener;
 
-    public function new(){
         udp = Dgram.createSocket("udp4");
         udp.on(SocketEvent.Error,onError);
         udp.on(SocketEvent.Message,onMessage);
@@ -44,53 +43,25 @@ class Server {
         trace('got message',request.type.label(),request.attributes);
         trace('transaction = ', request.transactionId);
 
+        function processResponse( err:Null<js.Error>, response:Data ) {
+            if( err != null && response != null ) {
+                respond(address, response);
+            }
+        }
+
         switch( request.type ) {
             case MessageType.AllocateRequest: 
+                listener.onAllocateRequest( request, processResponse );                
 
-                for( a in request.attributes ) {
-                    switch(a){
-                        case Fingerprint(fingerprint) :
-                            trace('CHECKING FINGERPRINT');
-                            trace(turn.message.Fingerprint.check(bytes,fingerprint) ? 'OK': 'KO');
-                        default:
-                    }
-                }
-                // for( a in request.attributes ) {
-                //     switch(a){
-                //         case Unknown( AttributeType.RequestedAddressFamily, _ ):
-                //             var response : turn.message.Data = {
-                //                 header : {
-                //                     type : MessageType.AllocateErrorResponse,
-                //                     transactionId: request.header.transactionId
-                //                 },
-                //                 attributes : [AttributeData.ErrorCode(440, "Address Family not Supported")]
-                //             };
+            case MessageType.BindingRequest:
+                listener.onBindingRequest( request, processResponse );
 
-                //             respond(address, response);
-                //             return;
-                //         default:
-                //     }
-                // }
-
-                var response : turn.message.Data = {
-                    type : MessageType.AllocateErrorResponse,
-                    transactionId: request.transactionId,
-                    attributes : [
-                        AttributeData.ErrorCode(401, "Unauthorized"),
-                        AttributeData.Nonce(nonce),
-                        AttributeData.Realm(realm),
-                        AttributeData.Software(software)
-                    ]
-                };
-
-                respond(address, response);
             default:
                 trace('nothing to do');
         }
     }
 
     function respond( address:SocketAdress, response:Data ) {
-        var client = udp;//Dgram.createSocket('udp4');
         var writer = new turn.message.Writer();
         writer.write(response);
         var message = writer.getBytes();
@@ -98,9 +69,8 @@ class Server {
         trace('to', address);
         var buf = js.node.Buffer.hxFromBytes(message);
 
-        client.send( buf,0, buf.length, address.port, address.address, function(err,int){
+        udp.send( buf,0, buf.length, address.port, address.address, function(err,int){
             trace('done responding',err,int);
-            //client.close();
         });
     }
 

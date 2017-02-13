@@ -2,6 +2,7 @@ package turn.message.attribute;
 
 import haxe.io.BytesOutput;
 import haxe.io.Bytes;
+import turn.message.attribute.Data;
 
 class Writer {
     var output : BytesOutput;
@@ -70,6 +71,15 @@ class Writer {
                 
                 writeData(AttributeType.Fingerprint, o.getBytes());
 
+            case MappedAddress(ip, port):
+                o.writeByte(0); // reserved
+
+                // FIXME: ipv6
+                o.writeByte(Family.IPV4);
+                o.writeUInt16(port);
+                o.writeInt32(ip);
+                
+                writeData(AttributeType.MappedAddress, o.getBytes());
 
             case Unknown(type,data):
                 writeData(type, data);
