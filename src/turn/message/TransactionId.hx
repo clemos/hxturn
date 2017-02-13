@@ -12,7 +12,7 @@ abstract TransactionId(Bytes) to Bytes {
         this=id;
     }
 
-    public inline function toString(){
+    @:to public function toString():String{
         return this.toHex();
     }
 

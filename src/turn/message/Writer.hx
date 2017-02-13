@@ -11,9 +11,7 @@ class Writer {
 
     var output:BytesOutput;
 
-    var addFingerprint=false;
-
-    static inline var FINGERPRINT_LENGTH = 8;
+    var addFingerprint=true;
 
     public function new(){
         output = new BytesOutput();
@@ -23,9 +21,9 @@ class Writer {
     public function getBytes(){
         var bytes = output.getBytes();
         if( addFingerprint ) {
-            var crc32 = haxe.crypto.Crc32.make( bytes );
+            var fp = turn.message.Fingerprint.make( bytes );
             var aWriter = new AttributeWriter();
-            aWriter.writeAttribute(Fingerprint(crc32));
+            aWriter.writeAttribute(Fingerprint(fp));
             var fingerprint = aWriter.getBytes();
 
             var o = new BytesOutput();
@@ -51,7 +49,7 @@ class Writer {
 
     function writeHeader(type:MessageType, transactionId:TransactionId, length:Int){
         output.writeUInt16(type);
-        output.writeUInt16(length + (addFingerprint ? FINGERPRINT_LENGTH : 0) );
+        output.writeUInt16(length + (addFingerprint ? turn.message.Fingerprint.FINGERPRINT_LENGTH : 0) );
         output.writeBytes(transactionId, 0, transactionId.length);
     }
 

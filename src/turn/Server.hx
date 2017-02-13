@@ -15,7 +15,7 @@ typedef AttributeData = turn.message.attribute.Data;
 class Server {
     var udp : Socket;
 
-    var nonce = "1234";
+    var nonce = "91217987db7f0936";
     var realm = "test";
     var software = "None";
 
@@ -27,8 +27,8 @@ class Server {
         udp.on(SocketEvent.Close,onClose);
     }
 
-    public function listen(port:Int){
-        udp.bind(port);
+    public function bind(port:Int, address:String){
+        udp.bind(port,address);
     }
 
     function onError(e:Error){
@@ -50,16 +50,8 @@ class Server {
                 for( a in request.attributes ) {
                     switch(a){
                         case Fingerprint(fingerprint) :
-                            //fingerprint = fingerprint & 0xffffffff;
-                            trace('got fingerprint',fingerprint,StringTools.hex(fingerprint));
-                            var check = bytes.sub(0,bytes.length-8);
-                            trace('checking', check.length );
-                            var crc32 = haxe.crypto.Crc32.make(check);
-                            crc32 = crc32 ^ 0x5354554e;
-                            //crc32 = crc32 & 0xffffffff;
-                            trace('crc32 = ', crc32, StringTools.hex(crc32));
-                            
-                            trace(crc32 == fingerprint ? 'ok': 'ko');
+                            trace('CHECKING FINGERPRINT');
+                            trace(turn.message.Fingerprint.check(bytes,fingerprint) ? 'OK': 'KO');
                         default:
                     }
                 }
@@ -105,6 +97,7 @@ class Server {
         trace('responding...',response);
         trace('to', address);
         var buf = js.node.Buffer.hxFromBytes(message);
+
         client.send( buf,0, buf.length, address.port, address.address, function(err,int){
             trace('done responding',err,int);
             //client.close();
@@ -113,6 +106,7 @@ class Server {
 
     function onListening(){
         trace('listening');
+        trace(udp.address());
     }
 
     function onClose(){

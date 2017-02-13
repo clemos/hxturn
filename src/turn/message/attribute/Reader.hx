@@ -12,6 +12,7 @@ class Reader {
 
     public function new(i:Input){
         input = i;
+        input.bigEndian = true;
     }
 
     public function read():Array<Data> {
@@ -29,24 +30,24 @@ class Reader {
                 case AttributeType.RequestedTransport:
                     attributes.push(readRequestedTransport());
                 case AttributeType.Username:
-                    attributes.push(Username(readAttribute().toString()));
+                    attributes.push(Username(readBytes().toString()));
                 case AttributeType.Realm:
-                    attributes.push(Realm(readAttribute().toString()));
+                    attributes.push(Realm(readBytes().toString()));
                 case AttributeType.Nonce:
-                    attributes.push(Nonce(readAttribute().toString()));
+                    attributes.push(Nonce(readBytes().toString()));
                 case AttributeType.Software:
-                    attributes.push(Software(readAttribute().toString()));
+                    attributes.push(Software(readBytes().toString()));
                 case AttributeType.Fingerprint:
-                    attributes.push(Fingerprint(readAttribute().getInt32(0)));
+                    attributes.push(readFingerprint());
                 default:
-                    attributes.push(Unknown(attributeType,readAttribute()));
+                    attributes.push(Unknown(attributeType,readBytes()));
             }
         }
         return attributes;
     }
 
-    function readAttribute():Bytes {
-        var length = input.readUInt16();
+    function readBytes():Bytes {
+        var length = readLength();
         var b = Bytes.alloc(length);
         input.readBytes(b,0,length);
 
@@ -60,8 +61,18 @@ class Reader {
         return b;
     }
 
+    function readLength():Int {
+        return input.readUInt16();
+    }
+
+    function readFingerprint():Data {
+        var length = readLength();
+        var fingerprint = input.readInt32() >>> 0;
+        return Fingerprint( fingerprint );
+    }
+
     function readRequestedTransport():Data{
-        var data = readAttribute();
+        var data = readBytes();
 
         if( data.length != 4 ){ 
             throw 'Invalid Requested Transport length: ${data.length} should be 4';

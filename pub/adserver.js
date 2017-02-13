@@ -10,7 +10,7 @@ for(var i=0; i<100; i++) {
 var iceCandidates = [];
 var googleIce = {url:'stun:stun.l.google.com:19302'};
 var localIce = {
-    urls: ['turn:127.0.0.1'],
+    urls: ['turn:127.0.0.1:3480'],
     //urls: ['turn:127.0.0.1:3478'],
     username: 'clemos',//username,
     credential: 'test'
