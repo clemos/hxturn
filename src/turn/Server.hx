@@ -14,10 +14,10 @@ typedef AttributeData = turn.message.attribute.Data;
 
 class Server {
     var udp : Socket;
-    var listener : ServerListener;
+    var adapter : Adapter;
 
-    public function new(listener:ServerListener){
-        this.listener = listener;
+    public function new(adapter:Adapter){
+        this.adapter = adapter;
 
         udp = Dgram.createSocket("udp4");
         udp.on(SocketEvent.Error,onError);
@@ -35,26 +35,23 @@ class Server {
     }
 
     function onMessage(buffer:Buffer, address:SocketAdress){
-        //trace('got message', buffer,address);
+        
         var bytes = buffer.hxToBytes();
-        //var input = new BytesInput(bytes);
         var data = new Reader(bytes);
-        var request = data.read();
-        trace('got message',request.type.label(),request.attributes);
-        trace('transaction = ', request.transactionId);
-
+        var request = new Request( address, data.read() );
+        
         function processResponse( err:Null<js.Error>, response:Data ) {
             if( err != null && response != null ) {
                 respond(address, response);
             }
         }
 
-        switch( request.type ) {
+        switch( request.message.type ) {
             case MessageType.AllocateRequest: 
-                listener.onAllocateRequest( request, processResponse );                
+                adapter.onAllocateRequest( request, processResponse );                
 
             case MessageType.BindingRequest:
-                listener.onBindingRequest( request, processResponse );
+                adapter.onBindingRequest( request, processResponse );
 
             default:
                 trace('nothing to do');

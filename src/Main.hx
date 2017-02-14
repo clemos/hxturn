@@ -13,9 +13,10 @@ class Main {
     static function main(){
         var server = new turn.Server({
             onAllocateRequest: function(request, cb){
+                trace('allocate request');
                 var response : turn.message.Data = {
                     type : turn.message.MessageType.AllocateErrorResponse,
-                    transactionId: request.transactionId,
+                    transactionId: request.message.transactionId,
                     attributes : [
                         AttributeData.ErrorCode(401, "Unauthorized"),
                         AttributeData.Nonce(nonce),
@@ -27,11 +28,12 @@ class Main {
                 cb(null, response);
             },
             onBindingRequest: function(request, cb){
+                trace('binding request');
                 var response : turn.message.Data = {
                     type: turn.message.MessageType.BindingResponse,
-                    transactionId: request.transactionId,
+                    transactionId: request.message.transactionId,
                     attributes: [
-                        //AttributeData.MappedAddress( address.address, address.port ),
+                        AttributeData.MappedAddress( request.from.address, request.from.port ),
                         AttributeData.Software(software)
                     ]
                 }

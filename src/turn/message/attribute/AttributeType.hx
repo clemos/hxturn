@@ -131,7 +131,6 @@ import haxe.io.Input;
     }
 
     @:from public static function fromInt(code:Int):AttributeType {
-        trace('attribute 0x${code.hex(4)}', LABELS[code]);
         if( !LABELS.exists(code) ) {
             throw 'Unknown attribute type: 0x${code.hex(4)}';
         }
