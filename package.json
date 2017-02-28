@@ -4,13 +4,11 @@
   "description": "",
   "main": "bin/server.js",
   "scripts": {
-    "watch": "watch 'npm run build' src",
     "postinstall": "npm run haxelib",
-    "haxelib": "haxelib --always install hxnodejs",
-    "build": "haxe build.hxml",
-    "start": "nodemon bin/server.js",
+    "haxelib": "haxelib --always install test.hxml",
+    "start:auth-server": "nodemon bin/test-auth-server.js",
     "serve": "http-server --cors pub",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "haxe test.hxml"
   },
   "author": "Clément Charmet <cl3mos@gmail.com> (http://github.com/clemos)",
   "license": "ISC",

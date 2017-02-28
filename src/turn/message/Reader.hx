@@ -7,7 +7,7 @@ import haxe.io.Input;
 
 import turn.message.MessageType;
 
-typedef AttributeReader = turn.message.attribute.Reader;
+private typedef AttributeReader = turn.message.attribute.Reader;
 
 class Reader {
 
@@ -16,23 +16,22 @@ class Reader {
     var bytes:Bytes;
     var input:Input;
 
-    public function new(bytes:Bytes){
-        this.bytes = bytes;
-        this.input = new BytesInput(bytes);
+    public function new(input:Input) {
+        this.input = input;
     }
 
     function readHeader(){
-        if( bytes.length < HEADER_LENGTH ) {
-            throw 'Message too short, less than $HEADER_LENGTH bytes';
-        }
+        // if( bytes.length < HEADER_LENGTH ) {
+        //     throw 'Message too short, less than $HEADER_LENGTH bytes';
+        // }
 
         var type = MessageType.read(input);
         var length : Int = input.readUInt16();
 
-        var actualLength = bytes.length - HEADER_LENGTH;
-        if( actualLength != length ) {
-            throw 'Invalid message length, expecting $length, actual is $actualLength';
-        }
+        // var actualLength = bytes.length - HEADER_LENGTH;
+        // if( actualLength != length ) {
+        //     throw 'Invalid message length, expecting $length, actual is $actualLength';
+        // }
 
         var transactionId = TransactionId.read(input);
 
@@ -43,6 +42,7 @@ class Reader {
     }
 
     function readAttributes(){
+        // fixme: check length
         var reader = new AttributeReader(input);
         return reader.read();
     }

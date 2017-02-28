@@ -1,6 +1,6 @@
 package turn.message;
 
-typedef AttributeData = turn.message.attribute.Data;
+private typedef AttributeData = turn.message.attribute.Data;
 
 typedef Data = {
     type: MessageType,

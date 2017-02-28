@@ -1,5 +1,6 @@
 package turn;
 import haxe.io.BytesInput;
+import haxe.io.BytesOutput;
 import js.Error;
 import js.node.Buffer;
 import js.node.dgram.Socket;
@@ -36,12 +37,12 @@ class Server {
 
     function onMessage(buffer:Buffer, address:SocketAdress){
         
-        var bytes = buffer.hxToBytes();
+        var bytes = new haxe.io.BytesInput(buffer.hxToBytes());
         var data = new Reader(bytes);
         var request = new Request( address, data.read() );
         
         function processResponse( err:Null<js.Error>, response:Data ) {
-            if( err != null && response != null ) {
+            if( err == null && response != null ) {
                 respond(address, response);
             }
         }
@@ -59,15 +60,18 @@ class Server {
     }
 
     function respond( address:SocketAdress, response:Data ) {
-        var writer = new turn.message.Writer();
+        var data = new BytesOutput();
+        var writer = new turn.message.Writer(data);
         writer.write(response);
-        var message = writer.getBytes();
-        trace('responding...',response);
-        trace('to', address);
+        var message = data.getBytes();
+        
+        // FIXME: DOESN'T WORK :(
+        // message = turn.message.Fingerprint.appendTo(message);
+        
         var buf = js.node.Buffer.hxFromBytes(message);
 
         udp.send( buf,0, buf.length, address.port, address.address, function(err,int){
-            trace('done responding',err,int);
+            //trace('done responding',err,int);
         });
     }
 

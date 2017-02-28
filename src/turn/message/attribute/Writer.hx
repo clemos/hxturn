@@ -2,13 +2,14 @@ package turn.message.attribute;
 
 import haxe.io.BytesOutput;
 import haxe.io.Bytes;
+import haxe.io.Output;
 import turn.message.attribute.Data;
 
 class Writer {
-    var output : BytesOutput;
+    var output:Output;
     
-    public function new() {
-        output = new BytesOutput();
+    public function new(output:Output) {
+        this.output = output;
         output.bigEndian = true;
     }
 
@@ -24,9 +25,9 @@ class Writer {
         
     }
 
-    public function getBytes():Bytes {
-        return output.getBytes();
-    }
+    // public function getBytes():Bytes {
+    //     return output.getBytes();
+    // }
 
     public function writeAttribute(a:Data):Void {
         var o = new BytesOutput();
