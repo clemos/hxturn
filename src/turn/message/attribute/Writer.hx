@@ -93,4 +93,12 @@ class Writer {
             writeAttribute(a);
         }
     }
+
+    public static inline function encode(attributes:Array<Data>):Bytes{
+        var o = new BytesOutput();
+        var w = new Writer(o);
+        w.write(attributes);
+        return o.getBytes();
+        
+    }
 }

@@ -66,7 +66,7 @@ class Server {
         var message = data.getBytes();
         
         // FIXME: DOESN'T WORK :(
-        // message = turn.message.Fingerprint.appendTo(message);
+        message = turn.message.Fingerprint.appendTo(message);
         
         var buf = js.node.Buffer.hxFromBytes(message);
 
