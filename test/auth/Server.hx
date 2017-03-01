@@ -33,11 +33,11 @@ class Server extends turn.Server {
                         ]
                     };
                 } else {
-                    // FIXME: doesn't work
                     {
                         type : turn.message.MessageType.AllocateResponse,
                         transactionId: request.message.transactionId,
                         attributes : [
+                            AttributeData.XorRelayedAddress(ADDRESS,1234),
                             AttributeData.Nonce(nonce),
                             AttributeData.Realm(realm),
                             AttributeData.Software(software)

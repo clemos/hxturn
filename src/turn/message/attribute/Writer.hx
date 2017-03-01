@@ -82,6 +82,17 @@ class Writer {
                 
                 writeData(AttributeType.MappedAddress, o.getBytes());
 
+            case XorRelayedAddress(ip, port):
+                o.writeByte(0); // reserved
+
+                // FIXME: ipv6
+                o.writeByte(Family.IPV4);
+                o.writeUInt16(port);
+                o.writeInt32(ip);
+                
+                writeData(AttributeType.XorRelayedAddress, o.getBytes());
+
+
             case Unknown(type,data):
                 writeData(type, data);
 
