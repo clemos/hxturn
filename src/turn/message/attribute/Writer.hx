@@ -76,12 +76,14 @@ class Writer {
 
             case MappedAddress(ip, port):
                 writeAddress(o, ip, port);
-                
                 writeData(AttributeType.MappedAddress, o.getBytes());
+
+            case XorMappedAddress(ip, port):
+                writeAddress(o, ip, port,true);
+                writeData(AttributeType.XorMappedAddress, o.getBytes());
 
             case XorRelayedAddress(ip, port):
                 writeAddress(o, ip, port, true);
-                
                 writeData(AttributeType.XorRelayedAddress, o.getBytes());
 
 

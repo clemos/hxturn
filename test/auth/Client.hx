@@ -11,7 +11,7 @@ class Client {
         };
 
         var localIce = {
-            urls: ['turn:127.0.0.1:3480'],
+            urls: ['stun:127.0.0.1:3480'],
             username: haxe.Json.stringify(message),
             credential: 'test'
         };
@@ -23,7 +23,8 @@ class Client {
         var channel = pc.createDataChannel('FOO');
         
         pc.onicecandidate = function(c){
-            trace('got ice candidate',c);
+            trace('got ice candidate');
+            untyped console.log(c.candidate);
         }
 
         pc.createOffer(function(desc){

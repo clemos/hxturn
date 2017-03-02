@@ -53,6 +53,7 @@ class Server extends turn.Server {
                     transactionId: request.message.transactionId,
                     attributes: [
                         AttributeData.MappedAddress( request.from.address, request.from.port ),
+                        AttributeData.XorMappedAddress( request.from.address, request.from.port ),
                         AttributeData.Software(software)
                     ]
                 }

@@ -42,6 +42,7 @@ enum Data {
     Fingerprint( fingerprint:Int );
 
     MappedAddress( address:Address, port:Int );
+    XorMappedAddress( address:Address, port:Int );
     XorRelayedAddress( address:Address, port:Int );
 
     Unknown( type:AttributeType, data:Bytes );
