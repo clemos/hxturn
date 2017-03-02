@@ -4,6 +4,7 @@ import haxe.io.BytesOutput;
 import haxe.io.Bytes;
 import haxe.io.Output;
 import turn.message.attribute.Data;
+import turn.message.MagicCookie;
 
 class Writer {
     var output:Output;
@@ -37,6 +38,7 @@ class Writer {
                 o.writeByte(protocol);
                 o.writeBytes(rffu,0,rffu.length);
                 writeData(AttributeType.RequestedTransport, o.getBytes());
+            
             case ErrorCode(code,reason):
                 o.writeByte(0);
                 o.writeByte(0);
@@ -73,22 +75,12 @@ class Writer {
                 writeData(AttributeType.Fingerprint, o.getBytes());
 
             case MappedAddress(ip, port):
-                o.writeByte(0); // reserved
-
-                // FIXME: ipv6
-                o.writeByte(Family.IPV4);
-                o.writeUInt16(port);
-                o.writeInt32(ip);
+                writeAddress(o, ip, port);
                 
                 writeData(AttributeType.MappedAddress, o.getBytes());
 
             case XorRelayedAddress(ip, port):
-                o.writeByte(0); // reserved
-
-                // FIXME: ipv6
-                o.writeByte(Family.IPV4);
-                o.writeUInt16(port);
-                o.writeInt32(ip);
+                writeAddress(o, ip, port, true);
                 
                 writeData(AttributeType.XorRelayedAddress, o.getBytes());
 
@@ -96,6 +88,20 @@ class Writer {
             case Unknown(type,data):
                 writeData(type, data);
 
+        }
+    }
+
+    inline function writeAddress(o:Output, ip:Address, port:Int, xor=false):Void{
+        o.writeByte(0); // reserved
+
+        // FIXME: ipv6
+        o.writeByte(Family.IPV4);
+        if( xor ){
+            o.writeUInt16((port ^ ( MagicCookie.VALUE >> 16 ) ) & 0xffff);
+            o.writeInt32(ip ^ MagicCookie.VALUE);
+        } else {
+            o.writeUInt16(port);
+            o.writeInt32(ip);
         }
     }
 
