@@ -16,6 +16,7 @@
     "haxe": "github:clemos/npm-haxe",
     "http-server": "^0.9.0",
     "nodemon": "^1.11.0",
-    "watch": "^1.0.1"
+    "watch": "^1.0.1",
+    "wrtc": "0.0.61"
   }
 }

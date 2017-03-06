@@ -47,7 +47,7 @@ class Server {
             }
         }
 
-        trace('got message',request.message.type.label(),request.message.attributes);
+        //trace('got message',request.message.type.label(),request.message.attributes);
 
         switch( request.message.type ) {
             case MessageType.AllocateRequest: 

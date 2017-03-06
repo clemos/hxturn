@@ -4,19 +4,30 @@
 
 --each
 
--main auth.Server 
+# -main auth.Server 
+# -lib hxnodejs
+# -js bin/test-auth-server.js
+
+# --next
+
+# -main auth.Client 
+# -js pub/test-auth-client.js
+
+# --next
+
 -lib hxnodejs
--js bin/test-auth-server.js
+-main peer.Server 
+-js pub/test-peer-server.js
 
 --next
 
--main auth.Client 
--js pub/test-auth-client.js
+-main peer.Client 
+-js pub/test-peer-client.js
 
---next
+# --next
 
--main Run
--lib hxnodejs
+# -main Run
+# -lib hxnodejs
 
--js bin/test.js
--cmd node bin/test.js
+# -js bin/test.js
+# -cmd node bin/test.js
