@@ -1,6 +1,6 @@
-package js.node.wrtc;
+package js.node.webrtc;
 
-@:jsRequire('wrtc','RTCSessionDescription')
+@:jsRequire('webrtc','RTCSessionDescription')
 extern class SessionDescription extends js.html.rtc.SessionDescription {
     
 }

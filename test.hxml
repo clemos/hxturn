@@ -15,6 +15,9 @@
 
 # --next
 
+
+-cp src
+-cp test
 -lib hxnodejs
 -main peer.Server 
 -js pub/test-peer-server.js

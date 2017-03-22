@@ -1,25 +1,29 @@
 package peer;
 
 import haxe.Json;
-import js.node.wrtc.*;
+import js.node.webrtc.*;
 import peer.Config;
 
 class Server {
 
     var offers : Array<ServerOffer>;
 
-    var POOL_SIZE = 1;
+    var POOL_SIZE = 5;
 
     var stunGun : turn.Server;
     var turnServer : turn.Server;
 
     var config: ConfigData;
 
+    var cert: Dynamic;
+
     function new(config:ConfigData){
         this.config = config;
         offers = [];
         trace('starting peer server');
+
         pool();
+        
 
         stunGun = new turn.Server({
             onAllocateRequest:function(_,_){
@@ -59,11 +63,17 @@ class Server {
                         hasUsername = true;
                         var currentOffer = offers[0];
                         var session = new SessionDescription(haxe.Json.parse(u));
-                        currentOffer.pc.setRemoteDescription(session,function(){
-                            trace('REMOTE DESCRIPTION SET', u);
-                        }, function(err){
-                            //trace('got error setting remote description',err);
-                        });
+                        trace('SETTING REMOTE DESCRIPTION', currentOffer.pc.iceConnectionState);
+                        if( !currentOffer.hasRemoteDescription ){
+                            currentOffer.hasRemoteDescription = true;
+                            currentOffer.pc.setRemoteDescription(session,function(){
+                                trace('REMOTE DESCRIPTION SET', u);
+                            }, function(err){
+                                trace('got error setting remote description',err);
+                            });
+                        } else {
+                            trace('connecting...');
+                        }
                         
                     default:
                         //trace('other attribute', Std.string(a));
@@ -127,9 +137,9 @@ class Server {
             urls: ['stun:${config.stun.address}:${config.stun.port}']
         }];
 
-        var offer = new ServerOffer(iceServers);
+        var offer = new ServerOffer(iceServers, [untyped Certificate.fromPEM( config.cert )]);
 
-        offer.start(function(desc){
+        offer.start(config.offer,function(desc){
             trace('server address', offer.ip, offer.port);   
             offers.push(offer);
             cb();
@@ -150,23 +160,29 @@ class ServerOffer {
 
     public var ip (default,null): String;
     public var port (default,null): Int;
+    public var hasRemoteDescription = false;
 
-    public function new( iceServers ){
+    public function new( iceServers, certs ){
         candidates = [];
-        pc = new PeerConnection({
+        pc = new PeerConnection(untyped {
             iceServers: iceServers,
+            certificates: certs
         });
-        pc.oniceconnectionstatechange = function(){
+        pc.addEventListener('iceconnectionstatechange', function(){
             trace('ICE CONNECTION STATE', pc.iceConnectionState);
-        };
+        });
+        pc.addEventListener('datachannel', function(c){
+            trace('got datachannel',c);
+            c.channel.send('HELLO');
+        });
         channel = pc.createDataChannel('test');
         channel.onopen = function(){
             trace('CHANNEL IS OPEN');
         };
     }
 
-    public function start( cb ){
-        pc.onicecandidate = function(c){
+    public function start( offer:js.html.rtc.SessionDescriptionInit, cb ){
+        pc.addEventListener('icecandidate', function(c){
             trace('got ice candidate',c.candidate);
             if( c.candidate != null ) {
                 candidates.push(c.candidate);
@@ -179,21 +195,16 @@ class ServerOffer {
                 description = pc.localDescription;
                 cb(description);
             }
-        }
-
-        pc.createOffer(function(offer){
-            trace('HERE IS THE OFFER');
-            trace(offer);
-            trace(Json.stringify(offer));
-            
-            pc.setLocalDescription(new SessionDescription(offer),function(){
-                trace('local description set');
-            }, function(err){
-                trace('got error setting local descrition',err);
-            } );
-        }, function(err){
-            trace('error creating offer',err);
         });
+
+        pc.setLocalDescription(new SessionDescription(offer),function(){
+            trace(pc.peerIdentity);
+            trace('local description set');
+        }, function(err){
+            trace(pc);
+            trace('got error setting local descrition',err);
+        } );
+        
     }
 
     public function getAddress(){

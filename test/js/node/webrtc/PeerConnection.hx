@@ -1,6 +1,6 @@
-package js.node.wrtc;
+package js.node.webrtc;
 
-@:jsRequire('wrtc','RTCPeerConnection')
+@:jsRequire('webrtc','RTCPeerConnection')
 extern class PeerConnection extends js.html.rtc.PeerConnection {
     
 }

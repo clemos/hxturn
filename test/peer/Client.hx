@@ -11,8 +11,6 @@ class Client {
 
     var pc : PeerConnection;
 
-    var JSON_OFFER : SessionDescriptionInit = {"type":SdpType.OFFER,"sdp":"v=0\r\no=- 105748813897781274 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=msid-semantic: WMS\r\nm=application 9 DTLS/SCTP 5000\r\nc=IN IP4 0.0.0.0\r\na=ice-ufrag:vP22M9MvRR7lhnxQ\r\na=ice-pwd:x3vuFY8eskba51ub5vbNFOO0\r\na=fingerprint:sha-256 1B:62:63:49:73:49:29:CB:E8:78:EA:35:1A:D2:A4:6F:A4:D4:79:0C:20:21:A5:CA:0A:A1:C8:2F:2F:10:4D:F4\r\na=setup:actpass\r\na=mid:data\r\na=sctpmap:5000 webrtc-datachannel 1024\r\n"};
-
     function new(config:ConfigData){
         this.config = config;
 
@@ -33,6 +31,10 @@ class Client {
             trace("CHANNEL IS OPEN");
         };
 
+        channel.onmessage = function(m){
+            trace("GOT MESSAGE",m.data);
+        }
+
         pc.onicecandidate = function(c){
             if( c.candidate == null ){
                 //trace('DONE');
@@ -43,7 +45,7 @@ class Client {
 
         }
 
-        //respondToOffer(JSON_OFFER);
+        respondToOffer(config.offer);
     }
 
     public function respondToOffer(offer) {
