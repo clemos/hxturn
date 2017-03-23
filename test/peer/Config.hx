@@ -39,3 +39,7 @@ class Config {
         };
     }
 }
+
+typedef AnswerData = { > ConfigAddress,
+    session : js.html.rtc.SessionDescriptionInit
+}

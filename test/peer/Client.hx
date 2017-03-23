@@ -2,6 +2,7 @@ package peer;
 
 import js.html.rtc.*;
 import peer.Config;
+import haxe.Json;
 
 class Client {
 
@@ -49,28 +50,32 @@ class Client {
     }
 
     public function respondToOffer(offer) {
-        var d = new SessionDescription(offer);
-        pc.setRemoteDescription( d , function(){
-            trace('successfully added remote desc');
-            pc.createAnswer(function(a){
-                trace('got answer',a);
-                pc.setLocalDescription(new SessionDescription(a), function(){
-                    trace('set local description');
-                    var turnClient = new TurnClient(config.turn);
-                    turnClient.sendAnswer(haxe.Json.stringify(pc.localDescription));
-                }, function(err){
-                    trace('error setting local description',err);
-                });
-            }, function(err){
-                trace('failed creating anwser',err);
-            });
-        }, function(err){
-            trace('error setting remote desc',err);
-        } );
-
         stunGun = new StunGunClient(config.stunGun);
         stunGun.getServerAddress(function(address,port){
             trace('got address $address $port');
+
+            var d = new SessionDescription(offer);
+            pc.setRemoteDescription( d , function(){
+                trace('successfully added remote desc');
+                pc.createAnswer(function(a){
+                    trace('got answer',a);
+                    pc.setLocalDescription(new SessionDescription(a), function(){
+                        trace('set local description');
+                        var turnClient = new TurnClient(config.turn);
+                        turnClient.sendAnswer({
+                            session:pc.localDescription,
+                            address: address,
+                            port: port
+                        });
+                    }, function(err){
+                        trace('error setting local description',err);
+                    });
+                }, function(err){
+                    trace('failed creating anwser',err);
+                });
+            }, function(err){
+                trace('error setting remote desc',err);
+            } );
 
             var serverCandidate = {
                 candidate:'candidate:1195654268 1 udp 2122260223 $address $port typ host generation 0',
@@ -140,12 +145,12 @@ class TurnClient {
         this.config = config;
     }
 
-    public function sendAnswer(data:String) {
+    public function sendAnswer(data:{session:SessionDescription,address:String,port:Int}) {
         trace('sending answer $data');
         var pc = new PeerConnection({
             iceServers: [{
                 urls:['turn:${config.address}:${config.port}'],
-                username: data,
+                username: Json.stringify(data),
                 credential: "toto"
             }]
         });
