@@ -55,18 +55,26 @@ class Client {
             trace('got address $address $port');
 
             var d = new SessionDescription(offer);
+        
+            pc.onicecandidate = function(c){
+                trace('got local ice candidate');
+                if( c.candidate == null ) {
+                    trace('gathering finished, sending answer to server', pc.localDescription.sdp);
+                    var turnClient = new TurnClient(config.turn);
+                    turnClient.sendAnswer({
+                        session:pc.localDescription,
+                        address: address,
+                        port: port
+                    });
+                }
+            };
+
             pc.setRemoteDescription( d , function(){
                 trace('successfully added remote desc');
                 pc.createAnswer(function(a){
                     trace('got answer',a);
                     pc.setLocalDescription(new SessionDescription(a), function(){
-                        trace('set local description');
-                        var turnClient = new TurnClient(config.turn);
-                        turnClient.sendAnswer({
-                            session:pc.localDescription,
-                            address: address,
-                            port: port
-                        });
+                        trace('local description set');
                     }, function(err){
                         trace('error setting local description',err);
                     });
@@ -76,6 +84,7 @@ class Client {
             }, function(err){
                 trace('error setting remote desc',err);
             } );
+
 
             var serverCandidate = {
                 candidate:'candidate:1195654268 1 udp 2122260223 $address $port typ host generation 0',

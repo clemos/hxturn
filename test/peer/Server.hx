@@ -53,7 +53,7 @@ class Server {
                         workerPool.getByAddress({address:data.address, port:data.port}, function(w){
                             var worker = w.worker;
                             var session = new SessionDescription(data.session);
-                            trace('SETTING REMOTE DESCRIPTION', worker.pc.iceConnectionState);
+                            trace('SETTING REMOTE DESCRIPTION', data.session);
                             if( !worker.hasRemoteDescription ){
                                 worker.hasRemoteDescription = true;
                                 worker.pc.setRemoteDescription(session,function(){
