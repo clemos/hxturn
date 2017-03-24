@@ -32,7 +32,9 @@ class WorkerPool {
     }
 
     public function getNext(cb){
+        trace('get next worker');
         var worker = workers.find(function(w){
+            trace('worker',w);
             return w.stunGunTransactionId == null;
         });
         cb(worker);
@@ -58,14 +60,24 @@ class WorkerPool {
         return getNext(function(w){
             w.stunGunTransactionId = id;
             cb(w);
+            pool();
         });
     }
 
+    function getFreeWorkers(cb){
+        cb(workers.filter(function(w){
+            return w.stunGunTransactionId == null && w.worker.hasRemoteDescription == false;
+        }));
+    }
+
     function pool(){
-        trace('creating ${POOL_SIZE-workers.length}');
-        if( workers.length < POOL_SIZE ) {
-            createWorker(pool);
-        }
+        getFreeWorkers(function(freeWorkers){
+            trace('creating ${POOL_SIZE-freeWorkers.length}');
+            if( freeWorkers.length < POOL_SIZE ) {
+                createWorker(pool);
+            }
+        });
+        
     }
 
     function createWorker( cb ){
