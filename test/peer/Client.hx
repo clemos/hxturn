@@ -159,7 +159,7 @@ class TurnClient {
         var pc = new PeerConnection({
             iceServers: [{
                 urls:['turn:${config.address}:${config.port}'],
-                username: Json.stringify(data),
+                username: Json.stringify(data), // FIXME: data is too long in FF (513 ch)
                 credential: "toto"
             }]
         });
