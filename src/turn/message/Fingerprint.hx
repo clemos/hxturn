@@ -28,7 +28,6 @@ class Fingerprint {
         return (haxe.crypto.Crc32.make( message ) ^ XOR) >>> 0;
     }
 
-    // FIXME: doesn't work
     public static function appendTo(message:Bytes):Bytes {
 
         var input = new BytesInput(message);
