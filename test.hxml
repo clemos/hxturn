@@ -3,18 +3,18 @@
 -cp test
 
 --each
-
+# build auth server
 -main auth.Server 
 -lib hxnodejs
 -js bin/test-auth-server.js
 
 --next
-
+# build auth client
 -main auth.Client 
 -js pub/test-auth-client.js
 
 --next
-
+# build and run UT
 -main Run
 -lib hxnodejs
 

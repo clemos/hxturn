@@ -36,7 +36,7 @@ class Server {
     }
 
     function onMessage(buffer:Buffer, address:SocketAdress){
-        
+        //FIXME: probably needs try/catch in case the request parsing throws errors
         var bytes = new haxe.io.BytesInput(buffer.hxToBytes());
         var data = new Reader(bytes);
         var request = new Request( address, data.read() );
@@ -57,6 +57,7 @@ class Server {
                 adapter.onBindingRequest( request, processResponse );
 
             default:
+                // FIXME: implement others.
                 trace('nothing to do');
         }
     }
@@ -67,7 +68,6 @@ class Server {
         writer.write(response);
         var message = data.getBytes();
         
-        // FIXME: DOESN'T WORK :(
         message = turn.message.Fingerprint.appendTo(message);
         
         var buf = js.node.Buffer.hxFromBytes(message);

@@ -10,15 +10,16 @@ class Server extends turn.Server {
 
     public function new(){
         super({
+
             onAllocateRequest: function(request, cb){
-                var hasUsername = false;
-                for( a in request.message.attributes ) switch(a){
-                    case AttributeData.Username(u):
-                        hasUsername = true;
-                        trace('got username', u);
-                    default:
-                        //trace('other attribute', Std.string(a));
-                }
+                // check that a username exists
+                var hasUsername = request.message.attributes.filter(function(a) return switch(a) {
+                    case AttributeData.Username(u): 
+                        trace("got username", u);
+                        true;
+                    default: 
+                        false;
+                }).length > 0;
 
                 var response : turn.message.Data = if( !hasUsername ) {
                     trace('no username, responding 401');
@@ -33,6 +34,7 @@ class Server extends turn.Server {
                         ]
                     };
                 } else {
+                    // received username, responding with a fake allocate response.
                     {
                         type : turn.message.MessageType.AllocateResponse,
                         transactionId: request.message.transactionId,
@@ -47,7 +49,7 @@ class Server extends turn.Server {
                 cb(null, response);
             },
             onBindingRequest: function(request, cb){
-                //trace('binding request');
+                // basic binding response (with correct reflexive address)
                 var response : turn.message.Data = {
                     type: turn.message.MessageType.BindingResponse,
                     transactionId: request.message.transactionId,
